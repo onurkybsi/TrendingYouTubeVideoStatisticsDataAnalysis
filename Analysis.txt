@@ -1,0 +1,16 @@
+
+How long usually a video can trend in different countries?
+
+How many likes, dislikes, views and comments get by different countries?
+
+Correlation of trending video in between countries
+
+Videos from which category has longer trend?
+
+Correlation between Days of Publish to Trend v/s Trending Duration
+
+Users like videos from which CATEGORY the most?
+
+What is the ratio of Likes-Dislikes and Views-Comments in different categories?
+
+What's the tags in the most negative and most positive category? What's the most discuss words for Science & Technology?
