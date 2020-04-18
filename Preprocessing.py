@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sn
+from sklearn.preprocessing import MinMaxScaler
 
 missingValues = ["n/a", "na", "null", -1, "none", "?","-", "/",None,"None","none","NaN","nan"]
 
@@ -201,3 +202,19 @@ dataWarehouse["comment_count"] = np.where(dataWarehouse["comment_count"] > 30000
 # plt.ylabel("Comment Count")
 # plt.title("Relation between video id and comment count")
 # plt.show()
+
+
+
+
+# Min-max normalization for numerical colums
+
+scaler = MinMaxScaler()
+
+dataWarehouse["views_scaled"] = 0
+dataWarehouse["likes_scaled"] = 0
+dataWarehouse["dislikes_scaled"] = 0
+dataWarehouse["comment_count_scaled"] = 0
+
+dataWarehouse[["views_scaled", "likes_scaled", "dislikes_scaled", "comment_count_scaled"]] = scaler.fit_transform(dataWarehouse[["views", "likes", "dislikes", "comment_count"]])
+
+print(dataWarehouse)
