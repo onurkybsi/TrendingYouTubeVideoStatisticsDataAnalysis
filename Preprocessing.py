@@ -34,8 +34,8 @@ print("\n")
 
 
 # Dropping "thumbnail_link" and "description" columns
-dataWarehoues = dataWarehouse.drop(columns = ['thumbnail_link'], axis = 1, inplace = True)
-dataWarehoues = dataWarehouse.drop(columns = ['description'], axis = 1, inplace = True)
+dataWarehouse.drop(columns = ['thumbnail_link'], axis = 1, inplace = True)
+dataWarehouse.drop(columns = ['description'], axis = 1, inplace = True)
 
 
 
@@ -116,6 +116,7 @@ for y in range(0, len(dataWarehouse["category"])):
 
 
 print(dataWarehouse.isnull().sum())
+print("\n")
 
 
 
@@ -141,7 +142,7 @@ print("Anomalies of rates of likes and dislikes " + str(len(requiredData[require
 print("Anomalies of relation between video id and views " + str(len(dataWarehouse[dataWarehouse["views"] > 9000000])))
 print("Anomalies of relation between video id and likes " + str(len(dataWarehouse[dataWarehouse["likes"] > 300000])))
 print("Anomalies of relation between video id and dislikes " + str(len(dataWarehouse[dataWarehouse["dislikes"] > 14000])))
-print("Anomalies of relation between video id and comment count " + str(len(dataWarehouse[dataWarehouse["comment_count"] > 30000])))
+print("Anomalies of relation between video id and comment count " + str(len(dataWarehouse[dataWarehouse["comment_count"] > 30000])) + "\n")
 
 
 
