@@ -1,7 +1,7 @@
 import pandas as pd
-from sklearn.preprocessing import MinMaxScaler
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LogisticRegression
+from sklearn.tree import DecisionTreeClassifier 
+from sklearn.model_selection import train_test_split 
+from sklearn import metrics 
 from sklearn.metrics import accuracy_score 
 
 processedDatas = pd.read_csv("processedDataset.csv")[["video_id","trending_date","title","channel_title","category","category_id","publish_time","tags","views","likes",
@@ -12,22 +12,14 @@ processedDatas = pd.read_csv("processedDataset.csv")[["video_id","trending_date"
 "gb_country", "in_country", "jp_country", "kr_country", "mx_country", "ru_country","us_country"
 ]]
 
-pd.options.display.max_columns = None
-pd.options.display.max_rows = None
-
-# print(processedDatas.head(20))
-
-
-
-
-# Logic regression
+# Decision tree
 # Verilen view sayısına gore videonun entertainment kategorisine ait olup olmadığını buluyor.
 
 entertainmentViewsPrediction = processedDatas[["views", "entertainment_cat"]]
 
 X_train, X_test, y_train, y_test = train_test_split(entertainmentViewsPrediction[["views"]], entertainmentViewsPrediction.entertainment_cat, train_size=0.8)
 
-model = LogisticRegression()
+model = DecisionTreeClassifier()
 
 model.fit(X_train, y_train)
 
@@ -35,11 +27,6 @@ predictions = model.predict(X_test)
 
 score = round(accuracy_score(y_test, predictions), 3)
 
+
 print(predictions)
 print(score)
-
-
-
-
-
-
