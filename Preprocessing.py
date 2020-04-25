@@ -218,4 +218,19 @@ dataWarehouse["comment_count_scaled"] = 0
 
 dataWarehouse[["views_scaled", "likes_scaled", "dislikes_scaled", "comment_count_scaled"]] = scaler.fit_transform(dataWarehouse[["views", "likes", "dislikes", "comment_count"]])
 
-print(dataWarehouse)
+
+
+# Dummy value assignment for the categorical columns
+
+for x in dataWarehouse["category"].unique():
+    columnName = x.lower().replace(" ", "") + "_cat"
+    dataWarehouse[columnName] = pd.get_dummies(dataWarehouse["category"])[x]
+
+for x in dataWarehouse["country_abb"].unique():
+    columnName = x.lower().replace(" ", "") + "_country"
+    dataWarehouse[columnName] = pd.get_dummies(dataWarehouse["country_abb"])[x]
+
+pd.options.display.max_columns = None
+pd.options.display.max_rows = None
+
+print(dataWarehouse.head(20))
