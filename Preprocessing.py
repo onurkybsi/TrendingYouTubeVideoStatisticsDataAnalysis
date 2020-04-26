@@ -234,3 +234,5 @@ pd.options.display.max_columns = None
 pd.options.display.max_rows = None
 
 print(dataWarehouse.head(20))
+
+# dataWarehouse.to_csv("processedDataset.csv", index=True)
