@@ -1,9 +1,8 @@
 import pandas as pd
-import numpy as np
+import PerformanceMetrics as performanceMetrics
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score 
-from sklearn.metrics import confusion_matrix as cm
+from sklearn.metrics import confusion_matrix
 
 processedDatas = pd.read_csv("../processedDataset.csv")[["video_id","trending_date","title","channel_title","category","category_id","publish_time","tags","views","likes",
 "dislikes","comment_count",
@@ -13,12 +12,7 @@ processedDatas = pd.read_csv("../processedDataset.csv")[["video_id","trending_da
 "gb_country", "in_country", "jp_country", "kr_country", "mx_country", "ru_country","us_country"
 ]]
 
-pd.options.display.max_columns = None
-pd.options.display.max_rows = None
 
-# print(processedDatas.head(20))
-
-# Random forest
 # Verilen view sayısına gore videonun entertainment kategorisine ait olup olmadığını buluyor.
 
 entertainmentViewsPrediction = processedDatas[["views", "entertainment_cat"]]
@@ -26,12 +20,58 @@ entertainmentViewsPrediction = processedDatas[["views", "entertainment_cat"]]
 X_train, X_test, y_train, y_test = train_test_split(entertainmentViewsPrediction[["views"]], entertainmentViewsPrediction.entertainment_cat, train_size=0.8)
 
 model = RandomForestClassifier()
-
 model.fit(X_train, y_train)
 
 predictions = model.predict(X_test)
 
-score = round(accuracy_score(y_test, predictions), 3)
+# Confusion Matrix
+confusionMatrix = confusion_matrix(y_test, predictions)
+print("entertainmentViewsPrediction / Confusion Matrix:")
+print(confusionMatrix)
 
-print(predictions)
-print(score)
+# Metrics for entertainment category prediction
+accuracyScore = performanceMetrics.accuracy(confusionMatrix)
+print("entertainmentViewsPrediction / Accuracy Score: {}".format(round(accuracyScore, 3)))
+
+precisionScore = performanceMetrics.precision(confusionMatrix)
+print("entertainmentViewsPrediction / Precision Score: {}".format(round(precisionScore, 3)))
+
+recallScore = performanceMetrics.recall(confusionMatrix)
+print("entertainmentViewsPrediction / Recall Score: {}".format(round(recallScore, 3)))
+
+fMeasureScore = performanceMetrics.fmeasure(confusionMatrix)
+print("entertainmentViewsPrediction / F-Mesaure Score: {}".format(round(fMeasureScore, 3)))
+
+
+
+
+# Verilen view sayısına gore videonun lokasyonunun US olup olmadığını buluyor.
+
+usViewsPrediction = processedDatas[["views", "us_country"]]
+
+X_train, X_test, y_train, y_test = train_test_split(usViewsPrediction[["views"]], usViewsPrediction.us_country, train_size=0.8)
+
+model = RandomForestClassifier()
+model.fit(X_train, y_train)
+
+predictions = model.predict(X_test)
+
+
+
+# Confusion Matrix
+confusionMatrix = confusion_matrix(y_test, predictions)
+print("usViewsPrediction / Confusion Matrix:")
+print(confusionMatrix)
+
+# Metrics for US location prediction
+accuracyScore = performanceMetrics.accuracy(confusionMatrix)
+print("usViewsPrediction / Accuracy Score: {}".format(round(accuracyScore, 3)))
+
+precisionScore = performanceMetrics.precision(confusionMatrix)
+print("usViewsPrediction / Precision Score: {}".format(round(precisionScore, 3)))
+
+recallScore = performanceMetrics.recall(confusionMatrix)
+print("usViewsPrediction / Recall Score: {}".format(round(recallScore, 3)))
+
+fMeasureScore = performanceMetrics.fmeasure(confusionMatrix)
+print("usViewsPrediction / F-Mesaure Score: {}".format(round(fMeasureScore, 3)))
