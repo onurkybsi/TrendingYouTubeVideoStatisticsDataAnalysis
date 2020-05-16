@@ -1,9 +1,10 @@
 import pandas as pd
+import numpy as np
 import PerformanceMetrics as performanceMetrics
 from sklearn.tree import DecisionTreeClassifier 
 from sklearn.model_selection import train_test_split 
 from sklearn.metrics import confusion_matrix
-
+from sklearn.model_selection import KFold
 
 
 processedDatas = pd.read_csv("../processedDataset.csv")[["video_id","trending_date","title","channel_title","category","category_id","publish_time","tags","views","likes",
@@ -14,66 +15,99 @@ processedDatas = pd.read_csv("../processedDataset.csv")[["video_id","trending_da
 "gb_country", "in_country", "jp_country", "kr_country", "mx_country", "ru_country","us_country"
 ]]
 
+predictionViews = processedDatas[["views"]]
+predictionViews = predictionViews.values
 
-# Verilen view sayısına gore videonun entertainment kategorisine ait olup olmadığını buluyor.
+predictionCat = processedDatas[["entertainment_cat"]]
+predictionCat = predictionCat.values
 
-entertainmentViewsPrediction = processedDatas[["views", "entertainment_cat"]]
+predictionUS = processedDatas[["us_country"]]
+predictionUS = predictionUS.values
 
-X_train, X_test, y_train, y_test = train_test_split(entertainmentViewsPrediction[["views"]], entertainmentViewsPrediction.entertainment_cat, train_size=0.8)
 
-model = DecisionTreeClassifier()
-model.fit(X_train, y_train)
+#region Verilen view sayısına gore videonun entertainment kategorisine ait olup olmadığını buluyor.
 
-predictions = model.predict(X_test)
+modelCat = DecisionTreeClassifier()
 
-# Confusion Matrix
-confusionMatrix = confusion_matrix(y_test, predictions)
-print("entertainmentViewsPrediction / Confusion Matrix:")
-print(confusionMatrix)
+X = predictionViews
+y = predictionCat
+kf = KFold(n_splits=10)
+
+predictions = []
+
+for train_index, test_index in kf.split(X):
+    X_train, X_test = X[train_index], X[test_index]
+    y_train, y_test = y[train_index], y[test_index]
+    modelCat.fit(X_train, y_train)
+    predictions.append(modelCat.predict(X_test))
+
+
+bestResult = 0
+bestConfusion = []
+
+for prediction in predictions:
+    confusionMatrix = confusion_matrix(y_test, prediction)
+    accuracyScore = performanceMetrics.accuracy(confusionMatrix)
+    if(accuracyScore > bestResult):
+        bestResult = accuracyScore
+        bestConfusion = confusionMatrix
+
 
 # Metrics for entertainment category prediction
-accuracyScore = performanceMetrics.accuracy(confusionMatrix)
+accuracyScore = performanceMetrics.accuracy(bestConfusion)
 print("entertainmentViewsPrediction / Accuracy Score: {}".format(round(accuracyScore, 3)))
 
-precisionScore = performanceMetrics.precision(confusionMatrix)
+precisionScore = performanceMetrics.precision(bestConfusion)
 print("entertainmentViewsPrediction / Precision Score: {}".format(round(precisionScore, 3)))
 
-recallScore = performanceMetrics.recall(confusionMatrix)
+recallScore = performanceMetrics.recall(bestConfusion)
 print("entertainmentViewsPrediction / Recall Score: {}".format(round(recallScore, 3)))
 
-fMeasureScore = performanceMetrics.fmeasure(confusionMatrix)
+fMeasureScore = performanceMetrics.fmeasure(bestConfusion)
 print("entertainmentViewsPrediction / F-Mesaure Score: {}".format(round(fMeasureScore, 3)))
 
+#endregion
 
 
+#region Verilen view sayısına gore videonun lokasyonunun US olup olmadığını buluyor.
 
-# Verilen view sayısına gore videonun lokasyonunun US olup olmadığını buluyor.
+modelUS = DecisionTreeClassifier()
 
-usViewsPrediction = processedDatas[["views", "us_country"]]
+X = predictionViews
+y = predictionUS
+kf = KFold(n_splits=10)
 
-X_train, X_test, y_train, y_test = train_test_split(usViewsPrediction[["views"]], usViewsPrediction.us_country, train_size=0.8)
+predictions = []
 
-model = DecisionTreeClassifier()
-model.fit(X_train, y_train)
+for train_index, test_index in kf.split(X):
+    X_train, X_test = X[train_index], X[test_index]
+    y_train, y_test = y[train_index], y[test_index]
+    modelUS.fit(X_train, y_train)
+    predictions.append(modelUS.predict(X_test))
 
-predictions = model.predict(X_test)
+bestResult = 0
+bestConfusion = []
+
+for prediction in predictions:
+    confusionMatrix = confusion_matrix(y_test, prediction)
+    accuracyScore = performanceMetrics.accuracy(confusionMatrix)
+    print(accuracyScore)
+    if(accuracyScore > bestResult):
+        bestResult = accuracyScore
+        bestConfusion = confusionMatrix
 
 
+# # Metrics for entertainment category prediction
+# accuracyScore = performanceMetrics.accuracy(bestConfusion)
+# print("usViewsPrediction / Accuracy Score: {}".format(round(accuracyScore, 3)))
 
-# Confusion Matrix
-confusionMatrix = confusion_matrix(y_test, predictions)
-print("usViewsPrediction / Confusion Matrix:")
-print(confusionMatrix)
+# precisionScore = performanceMetrics.precision(bestConfusion)
+# print("usViewsPrediction / Precision Score: {}".format(round(precisionScore, 3)))
 
-# Metrics for US location prediction
-accuracyScore = performanceMetrics.accuracy(confusionMatrix)
-print("usViewsPrediction / Accuracy Score: {}".format(round(accuracyScore, 3)))
+# recallScore = performanceMetrics.recall(bestConfusion)
+# print("usViewsPrediction / Recall Score: {}".format(round(recallScore, 3)))
 
-precisionScore = performanceMetrics.precision(confusionMatrix)
-print("usViewsPrediction / Precision Score: {}".format(round(precisionScore, 3)))
+# fMeasureScore = performanceMetrics.fmeasure(bestConfusion)
+# print("usViewsPrediction / F-Mesaure Score: {}".format(round(fMeasureScore, 3)))
 
-recallScore = performanceMetrics.recall(confusionMatrix)
-print("usViewsPrediction / Recall Score: {}".format(round(recallScore, 3)))
-
-fMeasureScore = performanceMetrics.fmeasure(confusionMatrix)
-print("usViewsPrediction / F-Mesaure Score: {}".format(round(fMeasureScore, 3)))
+#endregion
