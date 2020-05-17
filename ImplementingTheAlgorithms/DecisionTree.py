@@ -1,10 +1,9 @@
 import pandas as pd
-import numpy as np
 import PerformanceMetrics as performanceMetrics
 from sklearn.tree import DecisionTreeClassifier 
-from sklearn.model_selection import train_test_split 
 from sklearn.metrics import confusion_matrix
 from sklearn.model_selection import KFold
+import numpy as np
 
 
 processedDatas = pd.read_csv("../processedDataset.csv")[["video_id","trending_date","title","channel_title","category","category_id","publish_time","tags","views","likes",
@@ -15,42 +14,34 @@ processedDatas = pd.read_csv("../processedDataset.csv")[["video_id","trending_da
 "gb_country", "in_country", "jp_country", "kr_country", "mx_country", "ru_country","us_country"
 ]]
 
-predictionViews = processedDatas[["views"]]
-predictionViews = predictionViews.values
-
-predictionCat = processedDatas[["entertainment_cat"]]
-predictionCat = predictionCat.values
-
-predictionUS = processedDatas[["us_country"]]
-predictionUS = predictionUS.values
-
 
 #region Verilen view sayısına gore videonun entertainment kategorisine ait olup olmadığını buluyor.
 
-modelCat = DecisionTreeClassifier()
+modelUS = DecisionTreeClassifier()
+
+predictionViews = processedDatas[["views"]].to_numpy()
+
+predictionCat = processedDatas[["entertainment_cat"]].to_numpy()
+
+predictionUS = processedDatas[["us_country"]].to_numpy()
 
 X = predictionViews
 y = predictionCat
-kf = KFold(n_splits=10)
-
-predictions = []
-
-for train_index, test_index in kf.split(X):
-    X_train, X_test = X[train_index], X[test_index]
-    y_train, y_test = y[train_index], y[test_index]
-    modelCat.fit(X_train, y_train)
-    predictions.append(modelCat.predict(X_test))
-
+kf = KFold(n_splits=10,shuffle=False)
 
 bestResult = 0
 bestConfusion = []
 
-for prediction in predictions:
+for train_index, test_index in kf.split(X):
+    X_train, X_test = X[train_index], X[test_index]
+    y_train, y_test = y[train_index], y[test_index]
+    modelUS.fit(X_train, y_train.ravel())
+    prediction = modelUS.predict(X_test)
     confusionMatrix = confusion_matrix(y_test, prediction)
     accuracyScore = performanceMetrics.accuracy(confusionMatrix)
     if(accuracyScore > bestResult):
         bestResult = accuracyScore
-        bestConfusion = confusionMatrix
+        bestConfusion = confusionMatrix    
 
 
 # Metrics for entertainment category prediction
@@ -75,39 +66,34 @@ modelUS = DecisionTreeClassifier()
 
 X = predictionViews
 y = predictionUS
-kf = KFold(n_splits=10)
-
-predictions = []
-
-for train_index, test_index in kf.split(X):
-    X_train, X_test = X[train_index], X[test_index]
-    y_train, y_test = y[train_index], y[test_index]
-    modelUS.fit(X_train, y_train)
-    predictions.append(modelUS.predict(X_test))
+kf = KFold(n_splits=10,shuffle=False)
 
 bestResult = 0
 bestConfusion = []
 
-for prediction in predictions:
+for train_index, test_index in kf.split(X):
+    X_train, X_test = X[train_index], X[test_index]
+    y_train, y_test = y[train_index], y[test_index]
+    modelUS.fit(X_train, y_train.ravel())
+    prediction = modelUS.predict(X_test)
     confusionMatrix = confusion_matrix(y_test, prediction)
     accuracyScore = performanceMetrics.accuracy(confusionMatrix)
-    print(accuracyScore)
     if(accuracyScore > bestResult):
         bestResult = accuracyScore
-        bestConfusion = confusionMatrix
+        bestConfusion = confusionMatrix    
 
 
-# # Metrics for entertainment category prediction
-# accuracyScore = performanceMetrics.accuracy(bestConfusion)
-# print("usViewsPrediction / Accuracy Score: {}".format(round(accuracyScore, 3)))
+# Metrics for entertainment category prediction
+accuracyScore = performanceMetrics.accuracy(bestConfusion)
+print("USViewsPrediction / Accuracy Score: {}".format(round(accuracyScore, 3)))
 
-# precisionScore = performanceMetrics.precision(bestConfusion)
-# print("usViewsPrediction / Precision Score: {}".format(round(precisionScore, 3)))
+precisionScore = performanceMetrics.precision(bestConfusion)
+print("USViewsPrediction / Precision Score: {}".format(round(precisionScore, 3)))
 
-# recallScore = performanceMetrics.recall(bestConfusion)
-# print("usViewsPrediction / Recall Score: {}".format(round(recallScore, 3)))
+recallScore = performanceMetrics.recall(bestConfusion)
+print("USViewsPrediction / Recall Score: {}".format(round(recallScore, 3)))
 
-# fMeasureScore = performanceMetrics.fmeasure(bestConfusion)
-# print("usViewsPrediction / F-Mesaure Score: {}".format(round(fMeasureScore, 3)))
+fMeasureScore = performanceMetrics.fmeasure(bestConfusion)
+print("USViewsPrediction / F-Mesaure Score: {}".format(round(fMeasureScore, 3)))
 
 #endregion
