@@ -18,7 +18,7 @@ processedDatas = pd.read_csv("./processedDataset.csv")[["video_id","trending_dat
 "gb_country", "in_country", "jp_country", "kr_country", "mx_country", "ru_country","us_country"
 ]]
 
-sample_df = processedDatas.sample(1000)
+sample_df = processedDatas.sample(10000)
 
 modelDecisionTreeClassifier = DecisionTreeClassifier()
 modelGradientBoostingClassifier = GradientBoostingClassifier()
