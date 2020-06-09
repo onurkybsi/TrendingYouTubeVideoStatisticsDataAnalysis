@@ -4,6 +4,8 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import confusion_matrix
 from sklearn.model_selection import KFold
 import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 
 processedDatas = pd.read_csv("../processedDataset.csv")[["video_id","trending_date","title","channel_title","category","category_id","publish_time","tags","views","likes",
@@ -15,15 +17,15 @@ processedDatas = pd.read_csv("../processedDataset.csv")[["video_id","trending_da
 ]]
 
 
-#region Verilen view sayısına gore videonun entertainment kategorisine ait olup olmadığını buluyor.
-
-modelUS = LogisticRegression()
-
 predictionViews = processedDatas[["views"]].to_numpy()
 
 predictionCat = processedDatas[["entertainment_cat"]].to_numpy()
 
 predictionUS = processedDatas[["us_country"]].to_numpy()
+
+#region Verilen view sayısına gore videonun entertainment kategorisine ait olup olmadığını buluyor.
+
+modelUS = LogisticRegression()
 
 X = predictionViews
 y = predictionCat
@@ -43,6 +45,10 @@ for train_index, test_index in kf.split(X):
         bestResult = accuracyScore
         bestConfusion = confusionMatrix    
 
+ax = plt.axes()
+sns.heatmap(bestConfusion, annot=True, fmt="d", ax=ax)
+ax.set_title("Accuracy score for Entertainment category prediction: {}".format(round(bestResult, 3)))
+plt.show()
 
 # Metrics for entertainment category prediction
 accuracyScore = performanceMetrics.accuracy(bestConfusion)
@@ -82,6 +88,11 @@ for train_index, test_index in kf.split(X):
         bestResult = accuracyScore
         bestConfusion = confusionMatrix    
 
+
+ax = plt.axes()
+sns.heatmap(bestConfusion, annot=True, fmt="d", ax=ax)
+ax.set_title("Accuracy score for US location prediction: {}".format(round(bestResult, 3)))
+plt.show()
 
 # Metrics for entertainment category prediction
 accuracyScore = performanceMetrics.accuracy(bestConfusion)
